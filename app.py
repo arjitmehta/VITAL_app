@@ -766,6 +766,7 @@ def video():
     return Response(main(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__=="__main__":
-    from werkzeug.serving import run_simple
-    run_simple('localhost', 9000, app)
+    # from werkzeug.serving import run_simple
+    # run_simple('localhost', 9000, app)
+    app.run(debug=True)
 
