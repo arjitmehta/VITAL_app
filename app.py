@@ -28,7 +28,7 @@
 
 
 import cv2
-
+import numpy as np
 import time
 import PoseModule as pm
 from flask import Flask,render_template,Response
