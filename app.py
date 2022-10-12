@@ -25,13 +25,13 @@
 # <center><span style="font-family:Product Sans; font-size:1em;">All Rights Reserved.</span>
 
 # In[ ]:
-import cv2
+
 from flask import Flask,render_template,Response
 
-import numpy as np
-import time
-import PoseModule as pm
-import cv2
+# import numpy as np
+# import time
+# import PoseModule as pm
+# import cv2
 app=Flask(__name__)
 class VITAL():
     def yoga_beg_aasana0(img,detector):
@@ -759,7 +759,8 @@ def main():
         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return "HELLO"
+    #return render_template('index.html')
 
 @app.route('/video')
 def video():
