@@ -30,7 +30,7 @@ from flask import Flask,render_template,Response
 
 # import numpy as np
 # import time
-# import PoseModule as pm
+import PoseModule as pm
 # import cv2
 app=Flask(__name__)
 class VITAL():
