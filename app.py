@@ -759,8 +759,8 @@ def main():
         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 @app.route('/')
 def index():
-    return "HELLO"
-    #return render_template('index.html')
+    #return "HELLO"
+    return render_template('index.html')
 
 @app.route('/video')
 def video():
