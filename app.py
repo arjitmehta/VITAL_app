@@ -25,7 +25,7 @@
 # <center><span style="font-family:Product Sans; font-size:1em;">All Rights Reserved.</span>
 
 # In[ ]:
-
+import cv2
 from flask import Flask,render_template,Response
 
 import numpy as np
