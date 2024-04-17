@@ -3,11 +3,10 @@
 
 # In[ ]:
 
-
-# import cv2
-# import mediapipe as mp
-# import time
-# import math
+import cv2
+import mediapipe as mp
+import time
+import math
 
 
 class poseDetector():
@@ -18,8 +17,8 @@ class poseDetector():
         self.mode = mode
         self.upBody = upBody
         self.smooth = smooth
-        self.detectionCon = detectionCon
-        self.trackCon = trackCon
+        self.detectionCon = bool(detectionCon)
+        self.trackCon = bool(trackCon)
 
         self.mpDraw = mp.solutions.drawing_utils
         self.mpPose = mp.solutions.pose
@@ -79,9 +78,26 @@ class poseDetector():
 def main():
     cap = cv2.VideoCapture('PoseVideos/1.mp4')
     pTime = 0
-    detector = poseDetector()
+    detector = poseDetector(detectionCon=0.7)
+    if not cap.isOpened():
+      print("Error: Video file not opened")
+      exit()
+
+    # Check if the video file is empty
+    if cap.get(cv2.CAP_PROP_FRAME_COUNT) == 0:
+      print("Error: Video file is empty")
+      exit()
+
+    # Check if the video file is corrupted
+    if cap.get(cv2.CAP_PROP_FRAME_WIDTH) == 0 or cap.get(cv2.CAP_PROP_FRAME_HEIGHT) == 0:
+      print("Error: Video file is corrupted")
+      exit()
+
     while True:
         success, img = cap.read()
+        if not success:
+          print("Error: Could not read the first frame of the video")
+          exit()
         img = detector.findPose(img)
         lmList = detector.findPosition(img, draw=False)
         if len(lmList) != 0:
