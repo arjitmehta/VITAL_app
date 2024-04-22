@@ -11,7 +11,7 @@
 
 
 ## Demo
-![Video](Animation.mkv)
+![gif](Animation.gif)
 
 ## Overview
 Vital is a revolutionary mobile application designed to help you achieve optimal form and maximize results in your yoga, gym, and calisthenics workouts. Utilizing cutting-edge computer vision technology, Vital acts as your personal AI coach, providing real-time feedback on your posture throughout your exercises.
