@@ -26,15 +26,20 @@
 
 # In[ ]:
 
-# from flask import Flask,render_template,Response
+from flask import Flask,render_template,Response
 
 import numpy as np
 import time
 import PoseModule as pm
 import cv2
 import streamlit as st
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+
 # app=Flask(__name__)
-class VITAL():
+class VITAL:
+    def __init__(self):
+        pass
+    
     def yoga_beg_aasana0(img,detector):
         angle = detector.findAngle(img, 11, 13, 15, False)
         angle1 = detector.findAngle(img, 27, 25, 23, False)
@@ -602,170 +607,177 @@ class VITAL():
         per = np.interp(angle, (120, 40), (0, 100))
         return per
     
+    def process_frame(self, frame):
+        if frame is None:
+            print('returning blank frame')
+            return np.zeros((480, 640, 3), dtype=np.uint8)  # Return a blank frame instead of crashing
+        print('returning actual frame')
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    
              
    #****************************************************************************************************** 
+
+class VitalVideoTransformer(VideoTransformerBase):
+    def __init__(self):
+        # Instantiate your Vital processing class
+        self.vital = VITAL()
+
+    def transform(self, frame):
+        """
+        This method is called on each video frame received from the browser.
+        The frame comes as an instance that you can convert to a NumPy array.
+        """
+        try:
+            img = frame.to_ndarray(format="bgr24")
+            processed_img = self.vital.process_frame(img)
+            print('returning image from here' )
+            return processed_img
+        except Exception as e:
+            print(f"Error processing frame: {e}")
+            return np.zeros((480, 640, 3), dtype=np.uint8)
+
+# Main Streamlit application code
+st.title("My Vital App with WebRTC")
+
+# Use streamlit-webrtc to capture and process video
+webrtc_streamer(
+    key="vital-stream",
+    video_processor_factory=VitalVideoTransformer,
+    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+    async_processing=True
+)
     
     
-def main(): 
-    st.title("Live Video Streaming")
-    health = VITAL()
-    a="inter_9"
-    b=0
-    ex=0
-    cap = cv2.VideoCapture(0)
-    frame_window = st.image([])
+    
+    
+    
+#     health = VITAL()
+#     a="inter_9"
+#     b=0
+#     ex=0
+#     cap = cv2.VideoCapture(0)
+    
 
-    detector = pm.poseDetector()
-    count = 0
-    dir = 0
-    per=0
-    pTime = 0
-    while True:
+#     detector = pm.poseDetector()
+#     count = 0
+#     dir = 0
+#     per=0
+#     pTime = 0
+#     while True:
 
-        success, img = cap.read()
-        if not success:
-            st.write("Unable to read from webcam.")
-            break
+#         success, img = cap.read()    
+#         img = detector.findPose(img,False)
+#         lmList = detector.findPosition(img, False)
 
-        #img = cv2.imread("Yoga_test_images/Beginner/beg_6.png")
-        #img = cv2.resize(img, (720, 720))
-        
-        img = detector.findPose(img,False)
-        lmList = detector.findPosition(img, False)
-        # print(lmList)
-        if len(lmList) != 0:
+#         if len(lmList) != 0:
            
             
-            if a== 'ex_1' :
-                per = VITAL.lifting_curls_biceps(img,detector)
-                ex=1
-            if a== 'ex_2' :
-                per = VITAL.lifting_floor_press(img,detector) #make new conditions for respective functions
-                ex=1
-            if a== 'ex_3' :
-                per = VITAL.lifting_bentover_dumbbell(img,detector)
-                ex=1
-            if a== 'ex_4' :
-                per = VITAL.lifting_forearms(img,detector)
-                ex=1
-            if a== 'ex_5' :
-                per = VITAL.lifting_dumbell_squats(img,detector)
-                ex=1
-            if a== 'ex_6' :
-                per = VITAL.lifting_shoulder_press(img,detector)
-                ex=1
-            if a =='beg_1':
-                VITAL.yoga_beg_aasana1(img,detector)
-            if a =='beg_2':
-                VITAL.yoga_beg_aasana2(img,detector)
-            if a =='beg_3':
-                VITAL.yoga_beg_aasana3(img,detector)
-            if a =='beg_4':
-                VITAL.yoga_beg_aasana4(img,detector)
-            if a =='beg_5':
-                VITAL.yoga_beg_aasana5(img,detector)
-            if a =='beg_6':
-                VITAL.yoga_beg_aasana6(img,detector)
-            if a =='beg_7':
-                VITAL.yoga_beg_aasana7(img,detector)
-            if a =='beg_8':
-                VITAL.yoga_beg_aasana8(img,detector)
-            if a =='beg_9':
-                VITAL.yoga_beg_aasana9(img,detector)
-            if a =='beg_10':
-                VITAL.yoga_beg_aasana10(img,detector)
-            if a =='inter_1':
-                VITAL.yoga_inter_aasana1(img,detector)
-            if a =='inter_2':
-                VITAL.yoga_inter_aasana2 (img,detector)
-            if a =='inter_3':
-                VITAL.yoga_inter_aasana3(img,detector)
-            if a =='inter_4':
-                VITAL.yoga_inter_aasana4(img,detector)
-            if a =='inter_5':
-                VITAL.yoga_inter_aasana5(img,detector)
-            if a =='inter_6':
-                VITAL.yoga_inter_aasana6(img,detector)
-            if a =='inter_7':
-                VITAL.yoga_inter_aasana7(img,detector)
-            if a =='inter_8':
-                VITAL.yoga_inter_aasana8(img,detector)
-            if a =='inter_9':
-                VITAL.yoga_inter_aasana9(img,detector)
-            if a =='inter_10':
-                VITAL.yoga_inter_aasana10(img,detector)
-            if a =='adv_1':
-                VITAL.yoga_adv_aasana1(img,detector)
-            if a =='adv_2':
-                VITAL.yoga_adv_aasana2(img,detector)
-            if a =='adv_3':
-                VITAL.yoga_adv_aasana3(img,detector)
-            if a =='adv_4':
-                VITAL.yoga_adv_aasana4(img,detector)
-            if a =='adv_5':
-                VITAL.yoga_adv_aasana5(img,detector)
-            if a =='adv_6':
-                VITAL.yoga_adv_aasana6(img,detector)
-            if a =='adv_7':
-                VITAL.yoga_adv_aasana7(img,detector)
-            if a =='adv_8':
-                VITAL.yoga_adv_aasana8(img,detector)
-            if a =='adv_9':
-                VITAL.yoga_adv_aasana9(img,detector)
-            if a =='adv_10':
-                VITAL.yoga_adv_aasana10(img,detector)
+#             if a== 'ex_1' :
+#                 per = VITAL.lifting_curls_biceps(img,detector)
+#                 ex=1
+#             if a== 'ex_2' :
+#                 per = VITAL.lifting_floor_press(img,detector) #make new conditions for respective functions
+#                 ex=1
+#             if a== 'ex_3' :
+#                 per = VITAL.lifting_bentover_dumbbell(img,detector)
+#                 ex=1
+#             if a== 'ex_4' :
+#                 per = VITAL.lifting_forearms(img,detector)
+#                 ex=1
+#             if a== 'ex_5' :
+#                 per = VITAL.lifting_dumbell_squats(img,detector)
+#                 ex=1
+#             if a== 'ex_6' :
+#                 per = VITAL.lifting_shoulder_press(img,detector)
+#                 ex=1
+#             if a =='beg_1':
+#                 VITAL.yoga_beg_aasana1(img,detector)
+#             if a =='beg_2':
+#                 VITAL.yoga_beg_aasana2(img,detector)
+#             if a =='beg_3':
+#                 VITAL.yoga_beg_aasana3(img,detector)
+#             if a =='beg_4':
+#                 VITAL.yoga_beg_aasana4(img,detector)
+#             if a =='beg_5':
+#                 VITAL.yoga_beg_aasana5(img,detector)
+#             if a =='beg_6':
+#                 VITAL.yoga_beg_aasana6(img,detector)
+#             if a =='beg_7':
+#                 VITAL.yoga_beg_aasana7(img,detector)
+#             if a =='beg_8':
+#                 VITAL.yoga_beg_aasana8(img,detector)
+#             if a =='beg_9':
+#                 VITAL.yoga_beg_aasana9(img,detector)
+#             if a =='beg_10':
+#                 VITAL.yoga_beg_aasana10(img,detector)
+#             if a =='inter_1':
+#                 VITAL.yoga_inter_aasana1(img,detector)
+#             if a =='inter_2':
+#                 VITAL.yoga_inter_aasana2 (img,detector)
+#             if a =='inter_3':
+#                 VITAL.yoga_inter_aasana3(img,detector)
+#             if a =='inter_4':
+#                 VITAL.yoga_inter_aasana4(img,detector)
+#             if a =='inter_5':
+#                 VITAL.yoga_inter_aasana5(img,detector)
+#             if a =='inter_6':
+#                 VITAL.yoga_inter_aasana6(img,detector)
+#             if a =='inter_7':
+#                 VITAL.yoga_inter_aasana7(img,detector)
+#             if a =='inter_8':
+#                 VITAL.yoga_inter_aasana8(img,detector)
+#             if a =='inter_9':
+#                 VITAL.yoga_inter_aasana9(img,detector)
+#             if a =='inter_10':
+#                 VITAL.yoga_inter_aasana10(img,detector)
+#             if a =='adv_1':
+#                 VITAL.yoga_adv_aasana1(img,detector)
+#             if a =='adv_2':
+#                 VITAL.yoga_adv_aasana2(img,detector)
+#             if a =='adv_3':
+#                 VITAL.yoga_adv_aasana3(img,detector)
+#             if a =='adv_4':
+#                 VITAL.yoga_adv_aasana4(img,detector)
+#             if a =='adv_5':
+#                 VITAL.yoga_adv_aasana5(img,detector)
+#             if a =='adv_6':
+#                 VITAL.yoga_adv_aasana6(img,detector)
+#             if a =='adv_7':
+#                 VITAL.yoga_adv_aasana7(img,detector)
+#             if a =='adv_8':
+#                 VITAL.yoga_adv_aasana8(img,detector)
+#             if a =='adv_9':
+#                 VITAL.yoga_adv_aasana9(img,detector)
+#             if a =='adv_10':
+#                 VITAL.yoga_adv_aasana10(img,detector)
             
                 
-                #print(angle, per)
-                #Counting Reps
-            if ex==1:
-                color = (255, 0, 255)
-                if per == 100:
-                    color = (0, 255, 0)
-                    if dir == 0:
-                        count += 0.5
-                        dir = 1
+#                 #print(angle, per)
+#                 #Counting Reps
+#             if ex==1:
+#                 color = (255, 0, 255)
+#                 if per == 100:
+#                     color = (0, 255, 0)
+#                     if dir == 0:
+#                         count += 0.5
+#                         dir = 1
 
-                if per == 0:
-                    color = (0, 255, 0)
-                    if dir == 1:
-                        count += 0.5
-                        dir = 0
-                #cv2.putText(img, "maintain", (50, 100), cv2.FONT_HERSHEY_PLAIN, 5,(0, 0, 255), 5)
-                #print(count)
-                # Draw Rep Count
-                    cv2.rectangle(img, (0, 450), (250, 720), (0, 255, 0), cv2.FILLED)
-                    cv2.putText(img, str(int(count)), (45, 670), cv2.FONT_HERSHEY_PLAIN, 15,
-                                (255, 0, 0), 25)
-#         #FPS
-#         cTime = time.time()
-#         fps = 1 / (cTime - pTime)
-#         pTime = cTime
-#         cv2.putText(img, str(int(fps)), (50, 100), cv2.FONT_HERSHEY_PLAIN, 5,
-#                    (0, 255, 0), 5)
+#                 if per == 0:
+#                     color = (0, 255, 0)
+#                     if dir == 1:
+#                         count += 0.5
+#                         dir = 0
+#                 #cv2.putText(img, "maintain", (50, 100), cv2.FONT_HERSHEY_PLAIN, 5,(0, 0, 255), 5)
+#                 #print(count)
+#                 # Draw Rep Count
+#                     cv2.rectangle(img, (0, 450), (250, 720), (0, 255, 0), cv2.FILLED)
+#                     cv2.putText(img, str(int(count)), (45, 670), cv2.FONT_HERSHEY_PLAIN, 15,
+#                                 (255, 0, 0), 25)
 
- #****************************************************************************************************** 
-
-#         cv2.imshow("Image", img)
-#         if cv2.waitKey(1) == 13: #13 is the Enter Key
-#             break
-    
-#     cap.release()
-#     cv2.destroyAllWindows() 
-# if __name__ == "__main__":
-#     main()
-
- #****************************************************************************************************** 
-    
-    
-        frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        
-        # Update the frame in the placeholder
-        frame_window.image(frame, channels='RGB')
-        
-        # ret,buffer=cv2.imencode('.jpg',img)
-        # frame=buffer.tobytes()
-        # yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+#         ret,buffer=cv2.imencode('.jpg',img)
+#         frame=buffer.tobytes()
+#         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 # @app.route('/')
 # def index():
 #     #return "HELLO"
@@ -775,9 +787,10 @@ def main():
 # def video():
 #     return Response(main(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
-if __name__=="__main__":
-    main()
-    # from werkzeug.serving import run_simple
-    # run_simple('localhost', 9000, app)
-    # app.run(debug=True)
+# if __name__=="__main__":
+#     # from werkzeug.serving import run_simple
+#     # run_simple('localhost', 9000, app)
+#     app.run(debug=True)
+
+
 
