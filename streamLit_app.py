@@ -606,46 +606,49 @@ class VITAL:
         per = np.interp(angle, (120, 40), (0, 100))
         return per
     
-    def process_frame(self, frame):
-        if frame is None:
-            print('returning blank frame')
-            return np.zeros((480, 640, 3), dtype=np.uint8)  # Return a blank frame instead of crashing
-        print('returning actual frame')
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    
+webrtc_streamer(key="sample")
+    
+#     def process_frame(self, frame):
+#         if frame is None:
+#             print('returning blank frame')
+#             return np.zeros((480, 640, 3), dtype=np.uint8)  # Return a blank frame instead of crashing
+#         print('returning actual frame')
+#         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#         return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
     
              
-   #****************************************************************************************************** 
+#    #****************************************************************************************************** 
 
-class VitalVideoTransformer(VideoTransformerBase):
-    def __init__(self):
-        # Instantiate your Vital processing class
-        self.vital = VITAL()
+# class VitalVideoTransformer(VideoTransformerBase):
+#     def __init__(self):
+#         # Instantiate your Vital processing class
+#         self.vital = VITAL()
 
-    def transform(self, frame):
-        """
-        This method is called on each video frame received from the browser.
-        The frame comes as an instance that you can convert to a NumPy array.
-        """
-        try:
-            img = frame.to_ndarray(format="bgr24")
-            processed_img = self.vital.process_frame(img)
-            print('returning image from here' )
-            return processed_img
-        except Exception as e:
-            print(f"Error processing frame: {e}")
-            return np.zeros((480, 640, 3), dtype=np.uint8)
+#     def transform(self, frame):
+#         """
+#         This method is called on each video frame received from the browser.
+#         The frame comes as an instance that you can convert to a NumPy array.
+#         """
+#         try:
+#             img = frame.to_ndarray(format="bgr24")
+#             processed_img = self.vital.process_frame(img)
+#             print('returning image from here' )
+#             return processed_img
+#         except Exception as e:
+#             print(f"Error processing frame: {e}")
+#             return np.zeros((480, 640, 3), dtype=np.uint8)
 
-# Main Streamlit application code
-st.title("My Vital App with WebRTC")
+# # Main Streamlit application code
+# st.title("My Vital App with WebRTC")
 
-# Use streamlit-webrtc to capture and process video
-webrtc_streamer(
-    key="vital-stream",
-    video_processor_factory=VitalVideoTransformer,
-    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    async_processing=True
-)
+# # Use streamlit-webrtc to capture and process video
+# webrtc_streamer(
+#     key="vital-stream",
+#     video_processor_factory=VitalVideoTransformer,
+#     rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+#     async_processing=True
+# )
     
     
     
