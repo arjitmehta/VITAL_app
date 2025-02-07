@@ -1,5 +1,6 @@
 mediapipe
+streamlit-webrtc
 opencv_python_headless==4.5.5.64
 gunicorn==20.1.0
-streamlit==0.86.0
+streamlit
 numpy
